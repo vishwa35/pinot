@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.pinot.hadoop.job.preprocess;
+package org.apache.pinot.ingestion.preprocess;
 
 import com.google.common.base.Preconditions;
 import java.io.IOException;
@@ -43,10 +43,10 @@ import org.apache.orc.mapred.OrcStruct;
 import org.apache.orc.mapred.OrcValue;
 import org.apache.orc.mapreduce.OrcInputFormat;
 import org.apache.orc.mapreduce.OrcOutputFormat;
-import org.apache.pinot.hadoop.job.mappers.OrcDataPreprocessingMapper;
-import org.apache.pinot.hadoop.job.partitioners.OrcDataPreprocessingPartitioner;
-import org.apache.pinot.hadoop.job.reducers.OrcDataPreprocessingReducer;
-import org.apache.pinot.hadoop.utils.preprocess.HadoopUtils;
+import org.apache.pinot.ingestion.preprocess.mappers.OrcDataPreprocessingMapper;
+import org.apache.pinot.ingestion.preprocess.partitioners.OrcDataPreprocessingPartitioner;
+import org.apache.pinot.ingestion.preprocess.reducers.OrcDataPreprocessingReducer;
+import org.apache.pinot.ingestion.utils.preprocess.HadoopUtils;
 import org.apache.pinot.segment.spi.partition.PartitionFunctionFactory;
 import org.apache.pinot.spi.utils.StringUtils;
 import org.slf4j.Logger;
@@ -61,33 +61,24 @@ public class OrcDataPreprocessingHelper extends DataPreprocessingHelper {
   }
 
   @Override
-  Class<? extends Partitioner> getPartitioner() {
+  public Class<? extends Partitioner> getPartitioner() {
     return OrcDataPreprocessingPartitioner.class;
   }
 
   @Override
-  void setUpMapperReducerConfigs(Job job) {
-    TypeDescription orcSchema = getOrcSchema(_sampleRawDataPath);
-    String orcSchemaString = orcSchema.toString();
-    LOGGER.info("Orc schema is: {}", orcSchemaString);
-    validateConfigsAgainstSchema(orcSchema);
-
-    job.setInputFormatClass(OrcInputFormat.class);
-    job.setMapperClass(OrcDataPreprocessingMapper.class);
-    job.setMapOutputValueClass(OrcValue.class);
-    Configuration jobConf = job.getConfiguration();
-    OrcConf.MAPRED_SHUFFLE_VALUE_SCHEMA.setString(jobConf, orcSchemaString);
-
-    job.setReducerClass(OrcDataPreprocessingReducer.class);
-    // Use LazyOutputFormat to avoid creating empty files.
-    LazyOutputFormat.setOutputFormatClass(job, OrcOutputFormat.class);
-    job.setOutputKeyClass(NullWritable.class);
-    job.setOutputValueClass(OrcStruct.class);
-    OrcConf.MAPRED_OUTPUT_SCHEMA.setString(jobConf, orcSchemaString);
+  public Object getSchema(Path inputPathDir)
+      throws IOException {
+    return getOrcSchema(inputPathDir);
   }
 
   @Override
-  String getSampleTimeColumnValue(String timeColumnName)
+  public void validateConfigsAgainstSchema(Object schema) {
+    TypeDescription orcSchema = (TypeDescription) schema;
+    validateConfigsAgainstSchema(orcSchema);
+  }
+
+  @Override
+  public String getSampleTimeColumnValue(String timeColumnName)
       throws IOException {
     try (Reader reader = OrcFile
         .createReader(_sampleRawDataPath, OrcFile.readerOptions(HadoopUtils.DEFAULT_CONFIGURATION))) {

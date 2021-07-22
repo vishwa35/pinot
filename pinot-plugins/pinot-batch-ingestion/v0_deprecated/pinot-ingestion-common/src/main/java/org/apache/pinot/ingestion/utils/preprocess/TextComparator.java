@@ -16,26 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.pinot.hadoop.utils.preprocess;
+package org.apache.pinot.ingestion.utils.preprocess;
 
-import java.io.IOException;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.WritableComparator;
+import org.apache.hadoop.io.WritableUtils;
+import org.apache.pinot.spi.utils.StringUtils;
 
 
-public class HadoopUtils {
-  private HadoopUtils() {
+/**
+ * Override the Text comparison logic to compare with the decoded String instead of the byte array.
+ */
+public class TextComparator extends WritableComparator {
+  public TextComparator() {
+    super(Text.class);
   }
 
-  public static final Configuration DEFAULT_CONFIGURATION;
-  public static final FileSystem DEFAULT_FILE_SYSTEM;
-
-  static {
-    DEFAULT_CONFIGURATION = new Configuration();
-    try {
-      DEFAULT_FILE_SYSTEM = FileSystem.get(DEFAULT_CONFIGURATION);
-    } catch (IOException e) {
-      throw new IllegalStateException("Failed to get the default file system", e);
-    }
+  @Override
+  public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
+    int n1 = WritableUtils.decodeVIntSize(b1[s1]);
+    int n2 = WritableUtils.decodeVIntSize(b2[s2]);
+    return StringUtils.decodeUtf8(b1, s1 + n1, l1 - n1).compareTo(StringUtils.decodeUtf8(b2, s2 + n2, l2 - n2));
   }
 }

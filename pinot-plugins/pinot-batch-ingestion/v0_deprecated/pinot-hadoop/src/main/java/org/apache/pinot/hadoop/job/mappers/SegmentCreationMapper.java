@@ -35,7 +35,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.pinot.common.utils.TarGzCompressionUtils;
-import org.apache.pinot.hadoop.job.InternalConfigConstants;
+import org.apache.pinot.ingestion.utils.InternalConfigConstants;
 import org.apache.pinot.ingestion.common.JobConfigConstants;
 import org.apache.pinot.ingestion.jobs.SegmentCreationJob;
 import org.apache.pinot.plugin.inputformat.csv.CSVRecordReaderConfig;
