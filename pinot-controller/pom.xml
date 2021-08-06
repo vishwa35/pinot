@@ -254,7 +254,7 @@
             </goals>
             <phase>generate-resources</phase>
             <configuration>
-              <arguments>--stack-size=2000 $(which npm) install</arguments>
+              <arguments>clean-install</arguments>
             </configuration>
           </execution>
           <execution>
