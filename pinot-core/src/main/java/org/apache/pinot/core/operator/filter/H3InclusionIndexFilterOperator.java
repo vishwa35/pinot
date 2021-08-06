@@ -26,6 +26,7 @@ import org.apache.pinot.core.operator.blocks.FilterBlock;
 import org.apache.pinot.core.operator.dociditerators.ScanBasedDocIdIterator;
 import org.apache.pinot.core.operator.docidsets.BitmapDocIdSet;
 import org.apache.pinot.segment.local.utils.GeometrySerializer;
+import org.apache.pinot.segment.local.utils.H3Utils;
 import org.apache.pinot.segment.spi.IndexSegment;
 import org.apache.pinot.segment.spi.index.reader.H3IndexReader;
 import org.apache.pinot.spi.utils.BytesUtils;
@@ -73,16 +74,21 @@ public class H3InclusionIndexFilterOperator extends BaseFilterOperator {
 
     @Override
     protected FilterBlock getNextBlock() {
-        // have list of h3 hashes for polygon provided
-        // return filtered num_docs
         MutableRoaringBitmap fullMatchDocIds = new MutableRoaringBitmap();
-        for (long docId : _h3Ids) {
-            fullMatchDocIds.or(_h3IndexReader.getDocIds(docId));
-        }
-        fullMatchDocIds.flip(0L, _numDocs);
+        MutableRoaringBitmap partialMatchDocIds = new MutableRoaringBitmap();
 
-        // when h3 implements polyfill parameters for including partial matches, we can expand to include partial matches
-        return getFilterBlock(fullMatchDocIds, new MutableRoaringBitmap());
+        for (long fullMatch : _h3Ids) {
+            fullMatchDocIds.or(_h3IndexReader.getDocIds(fullMatch));
+            for (long partialMatch : H3Utils.H3_CORE.kRing(fullMatch, 1)) {
+                partialMatchDocIds.or(_h3IndexReader.getDocIds(partialMatch));
+            }
+        }
+
+        fullMatchDocIds.flip(0L, _numDocs);
+        partialMatchDocIds.flip(0L, _numDocs);
+
+        // when h3 implements polyfill parameters for including partial matches, we can use that instead of kRings.
+        return getFilterBlock(fullMatchDocIds, partialMatchDocIds);
     }
 
     /**

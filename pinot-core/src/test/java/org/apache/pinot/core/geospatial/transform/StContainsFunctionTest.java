@@ -40,5 +40,21 @@ public class StContainsFunctionTest extends GeoFunctionTest {
     assertRelation("ST_Contains", "LINESTRING (20 20, 30 30)", "POLYGON ((0 0, 0 4, 4 4, 4 0, 0 0))", false);
     assertRelation("ST_Contains", "LINESTRING EMPTY", "POLYGON ((0 0, 0 4, 4 4, 4 0, 0 0))", false);
     assertRelation("ST_Contains", "LINESTRING (20 20, 30 30)", "POLYGON EMPTY", false);
+
+    assertGeogRelation("ST_Contains", "POINT (20 20)", "POINT (25 25)", false);
+    assertGeogRelation("ST_Contains", "MULTIPOINT (20 20, 25 25)", "POINT (25 25)", true);
+    assertGeogRelation("ST_Contains", "LINESTRING (20 20, 30 30)", "POINT (25 25)", true);
+    assertGeogRelation("ST_Contains", "LINESTRING (20 20, 30 30)", "MULTIPOINT (25 25, 31 31)", false);
+    assertGeogRelation("ST_Contains", "LINESTRING (20 20, 30 30)", "LINESTRING (25 25, 27 27)", true);
+    assertGeogRelation("ST_Contains", "MULTILINESTRING ((1 1, 5 1), (2 4, 4 4))",
+            "MULTILINESTRING ((3 4, 4 4), (2 1, 6 1))", false);
+    assertGeogRelation("ST_Contains", "POLYGON ((0 0, 0 4, 4 4, 4 0, 0 0))", "POLYGON ((1 1, 1 2, 2 2, 2 1, 1 1))", true);
+    assertGeogRelation("ST_Contains", "POLYGON ((0 0, 0 4, 4 4, 4 0, 0 0))", "POLYGON ((-1 -1, -1 2, 2 2, 2 -1, -1 -1))",
+            false);
+    assertGeogRelation("ST_Contains", "MULTIPOLYGON (((0 0, 0 2, 2 2, 2 0, 0 0)), ((2 2, 2 4, 4 4, 4 2, 2 2)))",
+            "POLYGON ((2 2, 2 3, 3 3, 3 2, 2 2))", true);
+    assertGeogRelation("ST_Contains", "LINESTRING (20 20, 30 30)", "POLYGON ((0 0, 0 4, 4 4, 4 0, 0 0))", false);
+    assertGeogRelation("ST_Contains", "LINESTRING EMPTY", "POLYGON ((0 0, 0 4, 4 4, 4 0, 0 0))", false);
+    assertGeogRelation("ST_Contains", "LINESTRING (20 20, 30 30)", "POLYGON EMPTY", false);
   }
 }

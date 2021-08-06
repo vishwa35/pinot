@@ -86,6 +86,15 @@ public abstract  class GeoFunctionTest {
                 new Column(STRING_SV_COLUMN2, FieldSpec.DataType.STRING, new String[]{rightWkt})));
   }
 
+  protected void assertGeogRelation(String functionName, String leftWkt, String rightWkt, boolean result)
+          throws Exception {
+    assertIntFunction(
+            String.format("%s(ST_GeogFromText(%s),ST_GeogFromText(%s))", functionName, STRING_SV_COLUMN, STRING_SV_COLUMN2),
+            new int[]{result ? 1 : 0}, Arrays
+                    .asList(new Column(STRING_SV_COLUMN, FieldSpec.DataType.STRING, new String[]{leftWkt}),
+                            new Column(STRING_SV_COLUMN2, FieldSpec.DataType.STRING, new String[]{rightWkt})));
+  }
+
   protected void assertLongFunction(String function, long[] expectedValues, List<Column> columns)
       throws Exception {
     assertFunction(function, expectedValues.length, columns,

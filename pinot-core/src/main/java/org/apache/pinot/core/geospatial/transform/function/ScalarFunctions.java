@@ -24,6 +24,7 @@ import com.uber.h3core.LengthUnit;
 import com.uber.h3core.util.GeoCoord;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.pinot.segment.local.utils.GeometrySerializer;
 import org.apache.pinot.segment.local.utils.GeometryUtils;
@@ -149,9 +150,10 @@ public class ScalarFunctions {
   }
 
   public static int calcResFromMaxDist(double maxDist, int minHexagonEdges) {
-    return RESOLUTIONS.get(Collections.min(RESOLUTIONS.keySet().stream()
+    Set<Double> distances = RESOLUTIONS.keySet().stream()
             .filter(edgeLen -> edgeLen < maxDist / minHexagonEdges)
-            .collect(Collectors.toUnmodifiableSet())));
+            .collect(Collectors.toUnmodifiableSet());
+    return distances.size() > 0 ? RESOLUTIONS.get(Collections.min(distances)) : 15;
   }
 
   public static double maxDist(List<Coordinate> points) {

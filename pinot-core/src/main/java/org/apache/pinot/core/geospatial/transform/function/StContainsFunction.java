@@ -28,6 +28,7 @@ import org.apache.pinot.core.operator.transform.function.LiteralTransformFunctio
 import org.apache.pinot.core.operator.transform.function.TransformFunction;
 import org.apache.pinot.core.plan.DocIdSetPlanNode;
 import org.apache.pinot.segment.local.utils.GeometrySerializer;
+import org.apache.pinot.segment.local.utils.GeometryUtils;
 import org.apache.pinot.segment.spi.datasource.DataSource;
 import org.apache.pinot.spi.data.FieldSpec;
 import org.locationtech.jts.geom.Geometry;
@@ -82,6 +83,9 @@ public class StContainsFunction extends BaseTransformFunction {
     for (int i = 0; i < projectionBlock.getNumDocs(); i++) {
       Geometry firstGeometry = GeometrySerializer.deserialize(firstValues[i]);
       Geometry secondGeometry = GeometrySerializer.deserialize(secondValues[i]);
+      if (GeometryUtils.isGeography(firstGeometry) ^ GeometryUtils.isGeography(secondGeometry)) {
+        throw new RuntimeException(String.format("Both %s parameters must be of the same type: geography or geometry.", FUNCTION_NAME));
+      }
       _results[i] = firstGeometry.contains(secondGeometry) ? 1 : 0;
     }
     return _results;
