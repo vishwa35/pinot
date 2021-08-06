@@ -2,11 +2,14 @@ package org.apache.pinot.core.operator.filter;
 
 import com.google.common.collect.ImmutableList;
 import com.uber.h3core.util.GeoCoord;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.pinot.common.request.context.ExpressionContext;
 import org.apache.pinot.common.request.context.FunctionContext;
 import org.apache.pinot.common.request.context.predicate.EqPredicate;
-import org.apache.pinot.common.request.context.predicate.InPredicate;
 import org.apache.pinot.common.request.context.predicate.Predicate;
 import org.apache.pinot.core.geospatial.transform.function.ScalarFunctions;
 import org.apache.pinot.core.geospatial.transform.function.StContainsFunction;
@@ -21,16 +24,10 @@ import org.apache.pinot.spi.data.FieldSpec;
 import org.locationtech.jts.geom.Coordinate;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.doAnswer;
