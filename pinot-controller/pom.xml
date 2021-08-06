@@ -241,6 +241,7 @@
               <goal>install-node-and-npm</goal>
             </goals>
             <configuration>
+              <skip>true</skip>
               <nodeVersion>v10.16.1</nodeVersion>
               <npmVersion>6.10.0</npmVersion>
               <nodeDownloadRoot>http://nodejs.org/dist/</nodeDownloadRoot>
