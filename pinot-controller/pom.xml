@@ -248,6 +248,17 @@
             </configuration>
           </execution>
           <execution>
+            <id>npm ssl off</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <arguments>config set strict-ssl false
+              </arguments>
+            </configuration>
+          </execution>
+          <execution>
             <id>npm install</id>
             <goals>
               <goal>npm</goal>
@@ -255,16 +266,6 @@
             <phase>generate-resources</phase>
             <configuration>
               <arguments>clean-install</arguments>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm certs</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <arguments>config set ca ""</arguments>
             </configuration>
           </execution>
           <execution>
