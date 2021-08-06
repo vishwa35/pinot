@@ -254,8 +254,7 @@
             </goals>
             <phase>generate-resources</phase>
             <configuration>
-              <arguments>config set strict-ssl false
-              </arguments>
+              <arguments>config set strict-ssl false</arguments>
             </configuration>
           </execution>
           <execution>
